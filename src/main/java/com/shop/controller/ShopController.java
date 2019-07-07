@@ -51,11 +51,11 @@ public class ShopController {
   @CrossOrigin("*")
   @PatchMapping("/cart")
   @ApiOperation(value = "this endpoint modifies the items in a Cart", authorizations = {
-      @Authorization(value = "Bearer")}, response = BodyMessage.class)
+      @Authorization(value = "Bearer")}, notes="if set is true then the value specified will become the new count other wise it will be added to the current running counter of items", response = BodyMessage.class)
   @ApiImplicitParams({
       @ApiImplicitParam(name = "Authorization", value = "Bearer <tokenHere>", required = true, dataType = "string", paramType = "header")})
-  public ResponseEntity addRemoveItemsCart(@RequestBody Map<String, Long> items) {
-    return shopServices.addRemoveItemsCart(items);
+  public ResponseEntity addRemoveItemsCart(@RequestBody CartInput items) {
+    return shopServices.addRemoveItemsCart(items.getItems(),items.getSet());
   }
 
   @PatchMapping("/cart/checkout")

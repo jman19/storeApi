@@ -152,7 +152,7 @@ public class ShopServices {
     }
   }
 
-  public ResponseEntity addRemoveItemsCart(Map<String, Long> items) {
+  public ResponseEntity addRemoveItemsCart(Map<String, Long> items, Boolean set) {
     try {
       //validate that products to add exist and number
       for (String item : items.keySet()) {
@@ -186,12 +186,21 @@ public class ShopServices {
           Long count = cartToUpdate.getItems().get(item) + items.get(item);
           //ensure product count is positive or zero at end of change
           if (count >= 0) {
-            cartToUpdate.getItems().put(item, count);
+            //if set is true then set the amount to the value specified otherwise
+            //add/subTract it from the running total
+            if(set){
+              cartToUpdate.getItems().put(item, items.get(item));
+            }
+            else{
+              cartToUpdate.getItems().put(item, count);
+            }
+
             //remove item from Cart when count reaches zero
             if (count == 0) {
               cartToUpdate.getItems().remove(item);
             }
-          } else {
+          }
+          else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new BodyMessage("cannot remove more product then exist in Cart",
                     HttpStatus.BAD_REQUEST.value()));
@@ -199,9 +208,14 @@ public class ShopServices {
         }
         //put in new product
         else {
-          //dont add new product if amount to add is zero
-          if (items.get(item) != 0) {
+          //dont add new product if amount to add is zero or less
+          if (items.get(item) > 0) {
             cartToUpdate.getItems().put(item, items.get(item));
+          }
+          else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new BodyMessage("must added at least 1 item of a product",
+                            HttpStatus.BAD_REQUEST.value()));
           }
         }
       }

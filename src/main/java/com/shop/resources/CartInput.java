@@ -4,25 +4,15 @@ import java.util.Map;
 
 public class CartInput {
 
-  private String id;
   private Map<String, Long> items;
-  private Float totalCost;
+  private Boolean set;
 
   public CartInput() {
   }
 
-  public CartInput(String id, Map<String, Long> items, Float totalCost) {
-    this.id = id;
+  public CartInput(Map<String, Long> items, Boolean set) {
     this.items = items;
-    this.totalCost = totalCost;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
+    this.set = set;
   }
 
   public Map<String, Long> getItems() {
@@ -33,11 +23,11 @@ public class CartInput {
     this.items = items;
   }
 
-  public Float getTotalCost() {
-    return totalCost;
+  public Boolean getSet() {
+    return set;
   }
 
-  public void setTotalCost(Float totalCost) {
-    this.totalCost = totalCost;
+  public void setSet(Boolean set) {
+    this.set = set;
   }
 }

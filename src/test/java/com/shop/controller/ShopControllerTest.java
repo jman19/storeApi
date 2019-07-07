@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.shop.data.impl.Product;
+import com.shop.resources.CartInput;
 import com.shop.resources.LoginInput;
 import com.shop.resources.ProductUpdateInput;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class ShopControllerTest {
         .andExpect(status().isCreated())
         .andReturn();
 
-    String jwt = convertJsonStringToMap(response.getResponse().getContentAsString()).get("message")
+    String jwt = convertJsonStringToMap(response.getResponse().getContentAsString()).get("jwt")
         .toString();
 
     //existing User
@@ -67,7 +68,7 @@ public class ShopControllerTest {
     Map<String, Long> items = new HashMap<String, Long>();
     items.put("test", (long) 100);
     mockMvc.perform(patch("/cart").header("Authorization", "Bearer " + jwt)
-        .contentType(MediaType.APPLICATION_JSON).content(convertToJson(items)))
+        .contentType(MediaType.APPLICATION_JSON).content(convertToJson(new CartInput(items,false))))
         .andExpect(status().isOk());
 
     //checkout
@@ -89,7 +90,7 @@ public class ShopControllerTest {
         .andExpect(status().isCreated())
         .andReturn();
 
-    String jwt = convertJsonStringToMap(response.getResponse().getContentAsString()).get("message")
+    String jwt = convertJsonStringToMap(response.getResponse().getContentAsString()).get("jwt")
         .toString();
 
     //create a product
@@ -101,7 +102,7 @@ public class ShopControllerTest {
     Map<String, Long> items = new HashMap<String, Long>();
     items.put("test", (long) 100);
     mockMvc.perform(patch("/cart").header("Authorization", "Bearer " + jwt)
-        .contentType(MediaType.APPLICATION_JSON).content(convertToJson(items)))
+        .contentType(MediaType.APPLICATION_JSON).content(convertToJson(new CartInput(items,false))))
         .andExpect(status().isOk());
 
     //empty product before user can checkout
@@ -122,7 +123,7 @@ public class ShopControllerTest {
         .andExpect(status().isCreated())
         .andReturn();
 
-    String jwt = convertJsonStringToMap(response.getResponse().getContentAsString()).get("message")
+    String jwt = convertJsonStringToMap(response.getResponse().getContentAsString()).get("jwt")
         .toString();
 
     //create a product
@@ -134,7 +135,7 @@ public class ShopControllerTest {
     Map<String, Long> items = new HashMap<String, Long>();
     items.put("test", (long) 100);
     mockMvc.perform(patch("/cart").header("Authorization", "Bearer " + jwt)
-        .contentType(MediaType.APPLICATION_JSON).content(convertToJson(items)))
+        .contentType(MediaType.APPLICATION_JSON).content(convertToJson(new CartInput(items,false))))
         .andExpect(status().isBadRequest());
   }
 
