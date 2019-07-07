@@ -38,6 +38,7 @@ public class ShopController {
     return shopServices.createAccount(input);
   }
 
+  @CrossOrigin("*")
   @GetMapping("/cart")
   @ApiOperation(value = "this endpoint gets a Cart", authorizations = {
       @Authorization(value = "Bearer")}, response = Cart.class)
@@ -47,8 +48,8 @@ public class ShopController {
     return shopServices.getCart();
   }
 
+  @CrossOrigin("*")
   @PatchMapping("/cart")
-
   @ApiOperation(value = "this endpoint modifies the items in a Cart", authorizations = {
       @Authorization(value = "Bearer")}, response = BodyMessage.class)
   @ApiImplicitParams({

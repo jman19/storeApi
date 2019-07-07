@@ -123,6 +123,11 @@ public class ShopServices {
   public ResponseEntity getCart() {
     try {
       User user = getUserFromJwt(request);
+      //if user is not found then jwt is invalid or user was deleted
+      if(user==null){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new BodyMessage("invalid credentials", HttpStatus.UNAUTHORIZED.value()));
+      }
       if (user.getCart() == null) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(new BodyMessage("Cart not found", HttpStatus.NOT_FOUND.value()));
@@ -158,11 +163,17 @@ public class ShopServices {
                   HttpStatus.BAD_REQUEST.value()));
         } else if (product.getInventoryCount() == 0) {
           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-              new BodyMessage("Cart contains " + product.getTitle() + " which is out of stock",
+              new BodyMessage(product.getTitle() + " is out of stock",
                   HttpStatus.BAD_REQUEST.value()));
         }
       }
-      Cart cartToUpdate = getUserFromJwt(request).getCart();
+      User user=getUserFromJwt(request);
+      //if user is not found then jwt is invalid or user was deleted
+      if(user==null){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new BodyMessage("invalid credentials", HttpStatus.UNAUTHORIZED.value()));
+      }
+      Cart cartToUpdate = user.getCart();
       if (cartToUpdate == null) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(new BodyMessage("Cart not found", HttpStatus.NOT_FOUND.value()));
