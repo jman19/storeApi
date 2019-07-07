@@ -190,6 +190,10 @@ public class ShopServices {
             //add/subTract it from the running total
             if(set){
               cartToUpdate.getItems().put(item, items.get(item));
+              //the amount was set to zero so remove it from cart
+              if(items.get(item)==0){
+                cartToUpdate.getItems().remove(item);
+              }
             }
             else{
               cartToUpdate.getItems().put(item, count);

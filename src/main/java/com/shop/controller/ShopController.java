@@ -74,6 +74,7 @@ public class ShopController {
     return shopServices.createProduct(product);
   }
 
+  @CrossOrigin("*")
   @GetMapping("/product/{name}")
   @ApiOperation(value = "this endpoint gets a product's details", response = Product.class)
   public ResponseEntity getProduct(@PathVariable String name) {
