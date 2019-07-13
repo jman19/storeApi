@@ -58,6 +58,7 @@ public class ShopController {
     return shopServices.addRemoveItemsCart(items.getItems(),items.getSet());
   }
 
+  @CrossOrigin("*")
   @PatchMapping("/cart/checkout")
   @ApiOperation(value = "this endpoint is used for checking out a Cart", authorizations = {
       @Authorization(value = "Bearer")}, response = CheckOutResponse.class)
