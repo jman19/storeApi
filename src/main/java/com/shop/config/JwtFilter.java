@@ -31,7 +31,7 @@ public class JwtFilter extends GenericFilterBean {
       chain.doFilter(req, res);
     } else {
       if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-        throw new ServletException("Missing or invalid Authorization header");
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header");
       }
 
       chain.doFilter(req, res);

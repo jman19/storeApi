@@ -35,14 +35,14 @@ public class ShopController {
   @CrossOrigin("*")
   @PostMapping("/login")
   @ApiOperation(value = "this endpoint is used to login. returns a jwt token to be used by other services", response = LoginResponse.class)
-  public ResponseEntity login(@RequestBody LoginInput input) {
+  public ResponseEntity login(@RequestBody LoginInput input) throws Exception{
     return shopServices.login(input);
   }
 
   @CrossOrigin("*")
   @PostMapping("/signUp")
   @ApiOperation(value = "this endpoint is used to create a new account. returns a jwt token to be used by other services", response = LoginResponse.class)
-  public ResponseEntity signUp(@RequestBody SignUpInput input) {
+  public ResponseEntity signUp(@RequestBody SignUpInput input) throws Exception {
     return shopServices.createAccount(input);
   }
 
