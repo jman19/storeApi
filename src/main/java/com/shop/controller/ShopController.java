@@ -2,6 +2,7 @@ package com.shop.controller;
 
 import com.shop.data.impl.Product;
 import com.shop.data.impl.Cart;
+import com.shop.data.impl.User;
 import com.shop.resources.*;
 import com.shop.services.ShopServices;
 import io.swagger.annotations.ApiImplicitParam;
@@ -23,6 +24,13 @@ public class ShopController {
     this.shopServices = shopServices;
   }
 
+  @CrossOrigin("*")
+  @GetMapping("/user")
+  @ApiOperation(value = "this endpoint is used to get user info.",authorizations = {
+          @Authorization(value = "Bearer")}, response = UserInfo.class)
+  @ApiImplicitParams({
+          @ApiImplicitParam(name = "Authorization", value = "Bearer <tokenHere>", required = true, dataType = "string", paramType = "header")})
+  public ResponseEntity getUser(){return shopServices.getUserInfo();}
 
   @CrossOrigin("*")
   @PostMapping("/login")
@@ -34,7 +42,7 @@ public class ShopController {
   @CrossOrigin("*")
   @PostMapping("/signUp")
   @ApiOperation(value = "this endpoint is used to create a new account. returns a jwt token to be used by other services", response = LoginResponse.class)
-  public ResponseEntity signUp(@RequestBody LoginInput input) {
+  public ResponseEntity signUp(@RequestBody SignUpInput input) {
     return shopServices.createAccount(input);
   }
 

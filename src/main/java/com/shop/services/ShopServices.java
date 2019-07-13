@@ -31,7 +31,7 @@ public class ShopServices {
     this.env = env;
   }
 
-  public ResponseEntity createAccount(LoginInput form) {
+  public ResponseEntity createAccount(SignUpInput form) {
     try {
       Long expire=System.currentTimeMillis() + 3600000;
       String hash = DigestUtils.sha256Hex(form.getPassword());
@@ -44,6 +44,15 @@ public class ShopServices {
       user.setCart(quickRepository.createCart(new Cart()));
       user.setUser(form.getEmail());
       user.setPassword(hash);
+      //set user billing info
+      user.setFirstName(form.getFirstName());
+      user.setLastName(form.getLastName());
+      user.setCity(form.getCity());
+      user.setBillingAddress(form.getBillingAddress());
+      user.setProvince(form.getProvince());
+      user.setPostalCode(form.getPostalCode());
+      user.setPhone(form.getPhone());
+
       user = quickRepository.createUser(user);
       String jwtToken = Jwts.builder().setSubject("userLogin").claim("user", user)
           .setExpiration(new Date(expire)).setIssuedAt(new Date())
@@ -364,6 +373,29 @@ public class ShopServices {
       e.printStackTrace();
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body(new BodyMessage(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()));
+    }
+  }
+
+  public ResponseEntity getUserInfo(){
+    try {
+      User user = getUserFromJwt(request);
+      //if user is not found then jwt is invalid or user was deleted
+      if (user == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new BodyMessage("invalid credentials", HttpStatus.UNAUTHORIZED.value()));
+      }
+      return ResponseEntity.ok(new UserInfo(
+              user.getUser(),
+              user.getFirstName(),
+              user.getLastName(),
+              user.getCity(),
+              user.getBillingAddress(),
+              user.getProvince(),
+              user.getPostalCode(),
+              user.getPhone()));
+    }catch (Exception e){
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(new BodyMessage(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
   }
 
