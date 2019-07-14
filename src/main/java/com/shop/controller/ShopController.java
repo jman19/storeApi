@@ -26,98 +26,17 @@ public class ShopController {
   }
 
   @CrossOrigin("*")
-  @GetMapping("/user")
-  @ApiOperation(value = "this endpoint is used to get user info.",authorizations = {
-          @Authorization(value = "Bearer")}, response = UserInfo.class)
-  @ApiImplicitParams({
-          @ApiImplicitParam(name = "Authorization", value = "Bearer <tokenHere>", required = true, dataType = "string", paramType = "header")})
-  public ResponseEntity getUser(){return shopServices.getUserInfo();}
-
-  @CrossOrigin("*")
-  @GetMapping("/user/orderHistory")
-  @ApiOperation(value = "this endpoint is used to get user info.",authorizations = {
-          @Authorization(value = "Bearer")}, response = Fulfillment.class)
-  @ApiImplicitParams({
-          @ApiImplicitParam(name = "Authorization", value = "Bearer <tokenHere>", required = true, dataType = "string", paramType = "header")})
-  public ResponseEntity getUserOrderHistory(){return shopServices.getOrderHistory();}
-
-  @CrossOrigin("*")
-  @PostMapping("/login")
-  @ApiOperation(value = "this endpoint is used to login. returns a jwt token to be used by other services", response = LoginResponse.class)
-  public ResponseEntity login(@RequestBody LoginInput input) throws Exception{
-    return shopServices.login(input);
-  }
-
-  @CrossOrigin("*")
-  @PostMapping("/signUp")
-  @ApiOperation(value = "this endpoint is used to create a new account. returns a jwt token to be used by other services", response = LoginResponse.class)
-  public ResponseEntity signUp(@RequestBody SignUpInput input) throws Exception {
-    return shopServices.createAccount(input);
-  }
-
-  @CrossOrigin("*")
-  @GetMapping("/cart")
-  @ApiOperation(value = "this endpoint gets a Cart", authorizations = {
-      @Authorization(value = "Bearer")}, response = Cart.class)
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "Authorization", value = "Bearer <tokenHere>", required = true, dataType = "string", paramType = "header")})
-  public ResponseEntity getCart() {
-    return shopServices.getCart();
-  }
-
-  @CrossOrigin("*")
-  @PatchMapping("/cart")
-  @ApiOperation(value = "this endpoint modifies the items in a Cart", authorizations = {
-      @Authorization(value = "Bearer")}, notes="if set is true then the value specified will become the new count other wise it will be added to the current running counter of items", response = BodyMessage.class)
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "Authorization", value = "Bearer <tokenHere>", required = true, dataType = "string", paramType = "header")})
-  public ResponseEntity addRemoveItemsCart(@RequestBody CartInput items) {
-    return shopServices.addRemoveItemsCart(items.getItems(),items.getSet());
-  }
-
-  @CrossOrigin("*")
-  @PatchMapping("/cart/checkout")
-  @ApiOperation(value = "this endpoint is used for checking out a Cart", authorizations = {
-      @Authorization(value = "Bearer")}, response = CheckOutResponse.class)
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "Authorization", value = "Bearer <tokenHere>", required = true, dataType = "string", paramType = "header")})
-  public ResponseEntity checkout() {
-    return shopServices.checkOut();
-  }
-
-  @PostMapping("/product")
-  @ApiOperation(value = "this endpoint creates a new product for the store", response = Product.class, authorizations = {
-      @Authorization(value = "basicAuth")})
-  public ResponseEntity createProduct(@RequestBody Product product) {
-    return shopServices.createProduct(product);
-  }
-
-  @CrossOrigin("*")
-  @GetMapping("/product/{name}")
+  @GetMapping("/shop/product/{name}")
   @ApiOperation(value = "this endpoint gets a product's details", response = Product.class)
   public ResponseEntity getProduct(@PathVariable String name) {
     return shopServices.getProduct(name);
   }
 
   @CrossOrigin("*")
-  @GetMapping("/product")
+  @GetMapping("/shop/product")
   @ApiOperation(value = "this endpoint gets all product's details", response = ProductList.class)
   public ResponseEntity getAllProduct(@RequestParam("hideOutOfStock") Boolean hideOutOfStock) {
     return shopServices.getAllProducts(hideOutOfStock);
   }
 
-  @PutMapping("/product/{name}")
-  @ApiOperation(value = "this endpoint allows one to update a product's details", response = BodyMessage.class, authorizations = {
-      @Authorization(value = "basicAuth")})
-  public ResponseEntity updateProduct(@PathVariable String name,
-      @RequestBody ProductUpdateInput input) {
-    return shopServices.updateProduct(name, input);
-  }
-
-  @DeleteMapping("/product/{name}")
-  @ApiOperation(value = "This endpoint deletes a product from store", response = BodyMessage.class, authorizations = {
-      @Authorization(value = "basicAuth")})
-  public ResponseEntity deleteProduct(@PathVariable String name) {
-    return shopServices.deleteProduct(name);
-  }
 }

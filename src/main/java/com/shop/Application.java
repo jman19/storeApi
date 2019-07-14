@@ -15,7 +15,7 @@ public class Application {
   public FilterRegistrationBean jwtFilter() {
     final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
     registrationBean.setFilter(new JwtFilter());
-    registrationBean.addUrlPatterns("/cart/*","/user/*");
+    registrationBean.addUrlPatterns("/user/*");
 
     return registrationBean;
   }

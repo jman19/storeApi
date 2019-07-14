@@ -1,4 +1,4 @@
-package com.shop.controller;
+package com.shop;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @WithMockUser(username = "test", password = "test")
-public class ShopControllerTest {
+public class ApplicationTest {
 
   @Autowired
   private MockMvc mockMvc;
@@ -42,7 +42,7 @@ public class ShopControllerTest {
   @Transactional
   public void integrationTest() throws Exception {
     //brand new User
-    MvcResult response = mockMvc.perform(post("/signUp").contentType(MediaType.APPLICATION_JSON)
+    MvcResult response = mockMvc.perform(post("/auth/signUp").contentType(MediaType.APPLICATION_JSON)
         .content(convertToJson(new LoginInput("testUser", "password"))))
         .andExpect(status().isCreated())
         .andReturn();
@@ -51,33 +51,33 @@ public class ShopControllerTest {
         .toString();
 
     //existing User
-    mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
         .content(convertToJson(new LoginInput("testUser", "password"))))
         .andExpect(status().isOk());
 
     //get an existing Cart
-    mockMvc.perform(get("/cart").header("Authorization", "Bearer " + jwt))
+    mockMvc.perform(get("/user/cart").header("Authorization", "Bearer " + jwt))
         .andExpect(status().isOk());
 
     //create a product
-    mockMvc.perform(post("/product").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(post("/employee/product").contentType(MediaType.APPLICATION_JSON)
         .content(convertToJson(new Product("test", (float) 100, (long) 1000))))
         .andExpect(status().isCreated());
 
     //add product to existing Cart
     Map<String, Long> items = new HashMap<String, Long>();
     items.put("test", (long) 100);
-    mockMvc.perform(patch("/cart").header("Authorization", "Bearer " + jwt)
+    mockMvc.perform(patch("/user/cart").header("Authorization", "Bearer " + jwt)
         .contentType(MediaType.APPLICATION_JSON).content(convertToJson(new CartInput(items,false))))
         .andExpect(status().isOk());
 
     //checkout
-    mockMvc.perform(patch("/cart/checkout").header("Authorization", "Bearer " + jwt))
+    mockMvc.perform(patch("/user/cart/checkout").header("Authorization", "Bearer " + jwt))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.total").value(10000));
 
     //check that inventory updated
-    mockMvc.perform(get("/product/test"))
+    mockMvc.perform(get("/shop/product/test"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.inventoryCount").value(900));
   }
@@ -85,7 +85,7 @@ public class ShopControllerTest {
   @Test
   @Transactional
   public void cannotPurchaseOutOfStockItems() throws Exception {
-    MvcResult response = mockMvc.perform(post("/signUp").contentType(MediaType.APPLICATION_JSON)
+    MvcResult response = mockMvc.perform(post("/auth/signUp").contentType(MediaType.APPLICATION_JSON)
         .content(convertToJson(new LoginInput("testUser", "password"))))
         .andExpect(status().isCreated())
         .andReturn();
@@ -94,31 +94,31 @@ public class ShopControllerTest {
         .toString();
 
     //create a product
-    mockMvc.perform(post("/product").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(post("/employee/product").contentType(MediaType.APPLICATION_JSON)
         .content(convertToJson(new Product("test", (float) 100, (long) 1000))))
         .andExpect(status().isCreated());
 
     //add product to existing Cart
     Map<String, Long> items = new HashMap<String, Long>();
     items.put("test", (long) 100);
-    mockMvc.perform(patch("/cart").header("Authorization", "Bearer " + jwt)
+    mockMvc.perform(patch("/user/cart").header("Authorization", "Bearer " + jwt)
         .contentType(MediaType.APPLICATION_JSON).content(convertToJson(new CartInput(items,false))))
         .andExpect(status().isOk());
 
     //empty product before user can checkout
-    mockMvc.perform(put("/product/test").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(put("/employee/product/test").contentType(MediaType.APPLICATION_JSON)
         .content(convertToJson(new ProductUpdateInput(0L, 100F))))
         .andExpect(status().isOk());
 
     //ensure user gets error for trying to checkout without of stock product
-    mockMvc.perform(patch("/cart/checkout").header("Authorization", "Bearer " + jwt))
+    mockMvc.perform(patch("/user/cart/checkout").header("Authorization", "Bearer " + jwt))
         .andExpect(status().isBadRequest());
   }
 
   @Test
   @Transactional
   public void cannotAddOutOfStockItemsToCart() throws Exception {
-    MvcResult response = mockMvc.perform(post("/signUp").contentType(MediaType.APPLICATION_JSON)
+    MvcResult response = mockMvc.perform(post("/auth/signUp").contentType(MediaType.APPLICATION_JSON)
         .content(convertToJson(new LoginInput("testUser", "password"))))
         .andExpect(status().isCreated())
         .andReturn();
@@ -127,14 +127,14 @@ public class ShopControllerTest {
         .toString();
 
     //create a product
-    mockMvc.perform(post("/product").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(post("/employee/product").contentType(MediaType.APPLICATION_JSON)
         .content(convertToJson(new Product("test", (float) 100, (long) 0))))
         .andExpect(status().isCreated());
 
     //add product to existing Cart
     Map<String, Long> items = new HashMap<String, Long>();
     items.put("test", (long) 100);
-    mockMvc.perform(patch("/cart").header("Authorization", "Bearer " + jwt)
+    mockMvc.perform(patch("/user/cart").header("Authorization", "Bearer " + jwt)
         .contentType(MediaType.APPLICATION_JSON).content(convertToJson(new CartInput(items,false))))
         .andExpect(status().isBadRequest());
   }

@@ -24,9 +24,9 @@ public class BasicAuth extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http
         .authorizeRequests()
-        .mvcMatchers(HttpMethod.POST, "/product").authenticated()
-        .mvcMatchers(HttpMethod.PUT, "/product/*").authenticated()
-        .mvcMatchers(HttpMethod.DELETE, "/product/*").authenticated()
+        .mvcMatchers(HttpMethod.POST, "/employee/product").authenticated()
+        .mvcMatchers(HttpMethod.PUT, "/employee/product/*").authenticated()
+        .mvcMatchers(HttpMethod.DELETE, "/employee/product/*").authenticated()
         .anyRequest().permitAll()
         .and()
         .httpBasic()
