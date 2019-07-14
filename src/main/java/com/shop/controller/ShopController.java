@@ -1,5 +1,6 @@
 package com.shop.controller;
 
+import com.shop.data.impl.Fulfillment;
 import com.shop.data.impl.Product;
 import com.shop.data.impl.Cart;
 import com.shop.data.impl.User;
@@ -31,6 +32,14 @@ public class ShopController {
   @ApiImplicitParams({
           @ApiImplicitParam(name = "Authorization", value = "Bearer <tokenHere>", required = true, dataType = "string", paramType = "header")})
   public ResponseEntity getUser(){return shopServices.getUserInfo();}
+
+  @CrossOrigin("*")
+  @GetMapping("/user/orderHistory")
+  @ApiOperation(value = "this endpoint is used to get user info.",authorizations = {
+          @Authorization(value = "Bearer")}, response = Fulfillment.class)
+  @ApiImplicitParams({
+          @ApiImplicitParam(name = "Authorization", value = "Bearer <tokenHere>", required = true, dataType = "string", paramType = "header")})
+  public ResponseEntity getUserOrderHistory(){return shopServices.getOrderHistory();}
 
   @CrossOrigin("*")
   @PostMapping("/login")

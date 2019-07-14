@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "User")
@@ -27,6 +28,9 @@ public class User {
   @OneToOne(cascade = CascadeType.REMOVE)
   private Cart cart;
 
+  @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE,CascadeType.PERSIST})
+  private List<Fulfillment> fulfillment;
+
   public User() {
   }
 
@@ -41,6 +45,20 @@ public class User {
     this.postalCode = postalCode;
     this.phone = phone;
     this.cart = cart;
+  }
+
+  public User(String user, String password, String firstName, String lastName, String city, String billingAddress, String province, String postalCode, String phone, Cart cart, List<Fulfillment> fulfillment) {
+    this.user = user;
+    this.password = password;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.city = city;
+    this.billingAddress = billingAddress;
+    this.province = province;
+    this.postalCode = postalCode;
+    this.phone = phone;
+    this.cart = cart;
+    this.fulfillment = fulfillment;
   }
 
   public Long getId() {
@@ -129,5 +147,13 @@ public class User {
 
   public void setCart(Cart cart) {
     this.cart = cart;
+  }
+
+  public List<Fulfillment> getFulfillment() {
+    return fulfillment;
+  }
+
+  public void setFulfillment(List<Fulfillment> fulfillment) {
+    this.fulfillment = fulfillment;
   }
 }

@@ -1,14 +1,12 @@
 package com.shop.services;
 
 import com.shop.data.impl.Cart;
+import com.shop.data.impl.Fulfillment;
 import com.shop.data.impl.Product;
 import com.shop.data.QuickRepository;
 import com.shop.data.impl.User;
 import com.shop.resources.*;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +125,16 @@ public class ShopServices {
     }
   }
 
+  public ResponseEntity getOrderHistory(){
+    User user = getUserFromJwt(request);
+    //if user is not found then jwt is invalid or user was deleted
+    if(user==null){
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+              .body(new BodyMessage("invalid credentials", HttpStatus.UNAUTHORIZED.value()));
+    }
+    return ResponseEntity.ok(user.getFulfillment());
+  }
+
   public ResponseEntity deleteCart(Long id) {
     quickRepository.deleteCart(id);
     return ResponseEntity.ok(new BodyMessage("successfully deleted", HttpStatus.OK.value()));
@@ -210,12 +218,15 @@ public class ShopServices {
   }
 
   public ResponseEntity checkOut() {
-    Cart cart = getUserFromJwt(request).getCart();
+    User user = getUserFromJwt(request);
+    Cart cart=user.getCart();
+
     List<Product> productList = new ArrayList<Product>();
 
-    if (cart == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND)
-          .body(new BodyMessage("Cart not found", HttpStatus.NOT_FOUND.value()));
+    //if user is not found then jwt is invalid or user was deleted
+    if(user==null){
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+              .body(new BodyMessage("invalid credentials", HttpStatus.UNAUTHORIZED.value()));
     }
 
     //check that there are enough products available in inventory before completing checkout
@@ -240,11 +251,31 @@ public class ShopServices {
       quickRepository.createProduct(product);
     }
 
+    //create fulfillment Record
+    user.setFulfillment(new ArrayList<>());
+    user.getFulfillment().add(new Fulfillment(
+            user,
+            user.getUser(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getCity(),
+            user.getBillingAddress(),
+            user.getProvince(),
+            user.getPostalCode(),
+            user.getPhone(),
+            false,
+            new HashMap<>(cart.getItems()),
+            cart.getTotalCost()
+    ));
+
     Float total = cart.getTotalCost();
     //clear Cart
     cart.setTotalCost((float) 0);
     cart.setItems(new HashMap<>());
+
+    //update cart and user
     quickRepository.createCart(cart);
+    quickRepository.createUser(user);
 
     return ResponseEntity.ok(new CheckOutResponse("checkout completed", total));
 
@@ -335,7 +366,7 @@ public class ShopServices {
     return total;
   }
 
-  private User getUserFromJwt(HttpServletRequest request) throws MalformedJwtException, ExpiredJwtException {
+  private User getUserFromJwt(HttpServletRequest request) throws MalformedJwtException, ExpiredJwtException, SignatureException {
     String authHeader = request.getHeader("authorization");
     String token = authHeader.substring(7);
     String secret = Base64.getEncoder().encodeToString(env.getProperty("secret").getBytes());

@@ -3,6 +3,7 @@ package com.shop.ExceptionHandler;
 import com.shop.resources.BodyMessage;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,6 +21,12 @@ public class customExceptionHandler {
     public ResponseEntity handleExpiredToken(final ExpiredJwtException e){
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BodyMessage("JWT Token is Expired",HttpStatus.UNAUTHORIZED.value()));
     }
+
+    @ExceptionHandler({SignatureException.class})
+    public ResponseEntity handleUnknownSignatureToken(final SignatureException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BodyMessage("JWT Token Signature Unknown",HttpStatus.UNAUTHORIZED.value()));
+    }
+
     @ExceptionHandler({Exception.class})
     public ResponseEntity generalException(final Exception e){
         e.printStackTrace();

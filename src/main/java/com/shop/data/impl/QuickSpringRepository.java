@@ -13,11 +13,13 @@ public class QuickSpringRepository implements QuickRepository {
   private CartJPA cartJpa;
   private ProductJPA productJpa;
   private UserJPA userJPA;
+  private FulfillmentJPA fulfillmentJPA;
 
-  public QuickSpringRepository(CartJPA cart, ProductJPA product, UserJPA user) {
+  public QuickSpringRepository(CartJPA cart, ProductJPA product, UserJPA user, FulfillmentJPA fulfillmentJPA) {
     cartJpa = cart;
     productJpa = product;
     userJPA = user;
+    fulfillmentJPA=fulfillmentJPA;
   }
 
   public Cart createCart(Cart cart) {
@@ -73,4 +75,6 @@ public class QuickSpringRepository implements QuickRepository {
   public void deleteUser(Long id) {
     userJPA.deleteById(id);
   }
+
+  public List<Fulfillment> getAllFuilfillment() {return fulfillmentJPA.findAll();}
 }

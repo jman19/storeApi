@@ -1,5 +1,6 @@
 package com.shop.data;
 
+import com.shop.data.impl.Fulfillment;
 import com.shop.data.impl.Product;
 import com.shop.data.impl.Cart;
 import com.shop.data.impl.User;
@@ -8,26 +9,28 @@ import java.util.List;
 
 public interface QuickRepository {
 
-  public Cart createCart(Cart cart);
+  Cart createCart(Cart cart);
 
-  public Cart getCart(Long id);
+  Cart getCart(Long id);
 
-  public void deleteCart(Long id);
+  void deleteCart(Long id);
 
-  public Product createProduct(Product product);
+  Product createProduct(Product product);
 
-  public Product getProduct(String id);
+  Product getProduct(String id);
 
-  public List<Product> getAllProduct();
+  List<Product> getAllProduct();
 
-  public void deleteProduct(String id);
+  void deleteProduct(String id);
 
-  public User createUser(User user);
+  User createUser(User user);
 
-  public User getUser(String user, String password);
+  User getUser(String user, String password);
 
-  public User getUser(String user);
+  User getUser(String user);
 
-  public void deleteUser(Long id);
+  void deleteUser(Long id);
+
+  List<Fulfillment> getAllFuilfillment();
 
 }
