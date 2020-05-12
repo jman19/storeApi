@@ -89,6 +89,9 @@ Integration test our REST API spec and also act as documentation of API requirem
         * Pass in our JWT token in the Authorization header for http request
         * In our code we do `user = getUserFromJwt(request);` and get the user and their associated shopping cart.
 7. Check that the inventory count for purchased products.
+8. Check that User can change billing information
+9. Check that User can change credentials
+10. Check that User must enter correct passWord to change credentials
 
 #### cannotPurchaseOutOfStockItems()
 
