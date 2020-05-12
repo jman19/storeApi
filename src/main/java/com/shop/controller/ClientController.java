@@ -64,4 +64,15 @@ public class ClientController {
     public ResponseEntity checkout() {
         return clientServices.checkOut();
     }
+
+    @CrossOrigin("*")
+    @PatchMapping("/user")
+    @ApiOperation(value = "this endpoint is used to update user billing infromation.",authorizations = {
+            @Authorization(value = "Bearer")}, response = BodyMessage.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization", value = "Bearer <tokenHere>", required = true, dataType = "string", paramType = "header")})
+    public ResponseEntity updateBillingInfo(@RequestBody BillingInfo info){
+        return clientServices.updateBillingInfo(info);
+    }
+
 }

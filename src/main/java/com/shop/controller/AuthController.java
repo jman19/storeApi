@@ -1,15 +1,13 @@
 package com.shop.controller;
 
-import com.shop.resources.LoginInput;
-import com.shop.resources.LoginResponse;
-import com.shop.resources.SignUpInput;
+import com.shop.resources.*;
 import com.shop.services.AuthServices;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AuthController {
@@ -31,5 +29,15 @@ public class AuthController {
     @ApiOperation(value = "this endpoint is used to create a new account. returns a jwt token to be used by other services", response = LoginResponse.class)
     public ResponseEntity signUp(@RequestBody SignUpInput input) throws Exception {
         return authServices.createAccount(input);
+    }
+
+    @CrossOrigin("*")
+    @PatchMapping("/auth")
+    @ApiOperation(value = "this endpoint is used to update user creds returns new jwt for use.",authorizations = {
+            @Authorization(value = "Bearer")}, response = LoginResponse.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization", value = "Bearer <tokenHere>", required = true, dataType = "string", paramType = "header")})
+    public ResponseEntity updateCred(@RequestBody UpdateAuthInput updateAuthInput)throws Exception{
+        return authServices.updateAuth(updateAuthInput);
     }
 }

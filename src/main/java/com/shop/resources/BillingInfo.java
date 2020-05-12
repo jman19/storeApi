@@ -1,37 +1,22 @@
 package com.shop.resources;
 
-public class UserInfo {
-    private String user;
+public class BillingInfo {
     private String firstName;
     private String lastName;
     private String city;
     private String billingAddress;
     private String province;
     private String postalCode;
-    private String phone;
 
-    public UserInfo() {
-    }
+    public BillingInfo(){}
 
-    public UserInfo(String user, String firstName, String lastName, String city, String billingAddress, String province, String postalCode, String phone) {
-        //this is email address
-        this.user = user;
-        //name of user
+    public BillingInfo(String firstName, String lastName, String city, String billingAddress, String province, String postalCode) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.city = city;
         this.billingAddress = billingAddress;
         this.province = province;
         this.postalCode = postalCode;
-        this.phone = phone;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
     }
 
     public String getFirstName() {
@@ -80,13 +65,5 @@ public class UserInfo {
 
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 }

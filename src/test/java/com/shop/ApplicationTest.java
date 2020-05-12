@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.shop.data.impl.Product;
-import com.shop.resources.CartInput;
-import com.shop.resources.LoginInput;
-import com.shop.resources.ProductUpdateInput;
+import com.shop.resources.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,6 +146,68 @@ public class ApplicationTest {
     ObjectMapper mapper = new ObjectMapper();
     return mapper.readValue(json, new TypeReference<Map<String, Object>>() {
     });
+  }
+
+  @Test
+  @Transactional
+  public void changeBillingInfoTest() throws Exception {
+    MvcResult response = mockMvc.perform(post("/auth/signUp").contentType(MediaType.APPLICATION_JSON)
+            .content(convertToJson(new LoginInput("testUser", "password"))))
+            .andExpect(status().isCreated())
+            .andReturn();
+    String jwt = convertJsonStringToMap(response.getResponse().getContentAsString()).get("jwt")
+            .toString();
+    mockMvc.perform(patch("/user").header("Authorization", "Bearer " + jwt)
+            .contentType(MediaType.APPLICATION_JSON).content(convertToJson(new BillingInfo("jim", "bob", "townsVile", "17 grove street", "T", "LX1"))))
+            .andExpect(status().isOk());
+
+    mockMvc.perform(get("/user").header("Authorization", "Bearer " + jwt))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.firstName").value("jim"))
+            .andExpect(jsonPath("$.lastName").value("bob"))
+            .andExpect(jsonPath("$.city").value("townsVile"))
+            .andExpect(jsonPath("$.billingAddress").value("17 grove street"))
+            .andExpect(jsonPath("$.province").value("T"))
+            .andExpect(jsonPath("$.postalCode").value("LX1"));
+  }
+
+  @Test
+  @Transactional
+  public void changeCredInfo() throws Exception{
+    MvcResult response = mockMvc.perform(post("/auth/signUp").contentType(MediaType.APPLICATION_JSON)
+            .content(convertToJson(new LoginInput("testUser", "password"))))
+            .andExpect(status().isCreated())
+            .andReturn();
+    String jwt = convertJsonStringToMap(response.getResponse().getContentAsString()).get("jwt")
+            .toString();
+
+    response=mockMvc.perform(patch("/auth").header("Authorization", "Bearer " + jwt)
+            .contentType(MediaType.APPLICATION_JSON).content(convertToJson(new UpdateAuthInput("412-333-4999","test@test","password", "testPass"))))
+            .andExpect(status().isOk()).andReturn();
+
+    //the new updated jwt
+    jwt = convertJsonStringToMap(response.getResponse().getContentAsString()).get("jwt")
+            .toString();
+
+    mockMvc.perform(get("/user").header("Authorization", "Bearer " + jwt))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.user").value("test@test"))
+            .andExpect(jsonPath("$.phone").value("412-333-4999"));
+  }
+
+  @Test
+  @Transactional
+  public void changeCredInfoWrongPass() throws Exception{
+    MvcResult response = mockMvc.perform(post("/auth/signUp").contentType(MediaType.APPLICATION_JSON)
+            .content(convertToJson(new LoginInput("testUser", "password"))))
+            .andExpect(status().isCreated())
+            .andReturn();
+    String jwt = convertJsonStringToMap(response.getResponse().getContentAsString()).get("jwt")
+            .toString();
+
+    mockMvc.perform(patch("/auth").header("Authorization", "Bearer " + jwt)
+            .contentType(MediaType.APPLICATION_JSON).content(convertToJson(new UpdateAuthInput("412-333-4999","test@test","wrongPass", "testPass"))))
+            .andExpect(status().isUnauthorized());
   }
 
 }

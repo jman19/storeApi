@@ -5,37 +5,24 @@ import com.shop.data.impl.Cart;
 import com.shop.data.impl.Fulfillment;
 import com.shop.data.impl.Product;
 import com.shop.data.impl.User;
-import com.shop.resources.BodyMessage;
-import com.shop.resources.CheckOutResponse;
-import com.shop.resources.UserInfo;
-import com.shop.resources.UserOrderHistoryResponse;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import com.shop.resources.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Service
 public class ClientServices {
     private QuickRepository quickRepository;
-    private Environment env;
-    @Autowired
-    private HttpServletRequest request;
+    private Util util;
 
-    public ClientServices(QuickRepository quickRepository, Environment env) {
+    public ClientServices(QuickRepository quickRepository, Util util) {
         this.quickRepository = quickRepository;
-        this.env = env;
+        this.util=util;
     }
 
     public ResponseEntity getCart() {
-        User user = getUserFromJwt(request);
+        User user = util.getUserFromJwt();
         //if user is not found then jwt is invalid or user was deleted
         if(user==null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -49,8 +36,27 @@ public class ClientServices {
         }
     }
 
+    public ResponseEntity updateBillingInfo(BillingInfo form){
+        User user = util.getUserFromJwt();
+        //if user is not found then jwt is invalid or user was deleted
+        if(user==null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BodyMessage("invalid credentials", HttpStatus.UNAUTHORIZED.value()));
+        }
+
+        //set user billing info
+        user.setFirstName(form.getFirstName());
+        user.setLastName(form.getLastName());
+        user.setCity(form.getCity());
+        user.setBillingAddress(form.getBillingAddress());
+        user.setProvince(form.getProvince());
+        user.setPostalCode(form.getPostalCode());
+        quickRepository.createUser(user);
+        return ResponseEntity.ok(new BodyMessage("Info updated",HttpStatus.OK.value()));
+    }
+
     public ResponseEntity getOrderHistory(){
-        User user = getUserFromJwt(request);
+        User user = util.getUserFromJwt();
         //if user is not found then jwt is invalid or user was deleted
         if(user==null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -73,7 +79,7 @@ public class ClientServices {
                                 HttpStatus.BAD_REQUEST.value()));
             }
         }
-        User user=getUserFromJwt(request);
+        User user=util.getUserFromJwt();
         //if user is not found then jwt is invalid or user was deleted
         if(user==null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -137,7 +143,7 @@ public class ClientServices {
     }
 
     public ResponseEntity checkOut() {
-        User user = getUserFromJwt(request);
+        User user = util.getUserFromJwt();
         Cart cart=user.getCart();
 
         List<Product> productList = new ArrayList<Product>();
@@ -201,7 +207,7 @@ public class ClientServices {
     }
 
     public ResponseEntity getUserInfo(){
-        User user = getUserFromJwt(request);
+        User user = util.getUserFromJwt();
         //if user is not found then jwt is invalid or user was deleted
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -229,17 +235,4 @@ public class ClientServices {
 
         return total;
     }
-
-    private User getUserFromJwt(HttpServletRequest request) throws MalformedJwtException, ExpiredJwtException, SignatureException {
-        String authHeader = request.getHeader("authorization");
-        String token = authHeader.substring(7);
-        String secret = Base64.getEncoder().encodeToString(env.getProperty("secret").getBytes());
-        String userName = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody()
-                .get("user", LinkedHashMap.class).get("user").toString();
-        String password = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody()
-                .get("user", LinkedHashMap.class).get("password").toString();
-        return quickRepository.getUser(userName, password);
-    }
-
-
 }
