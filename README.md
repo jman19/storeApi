@@ -89,9 +89,6 @@ Integration test our REST API spec and also act as documentation of API requirem
         * Pass in our JWT token in the Authorization header for http request
         * In our code we do `user = getUserFromJwt(request);` and get the user and their associated shopping cart.
 7. Check that the inventory count for purchased products.
-8. Check that User can change billing information
-9. Check that User can change credentials
-10. Check that User must enter correct passWord to change credentials
 
 #### cannotPurchaseOutOfStockItems()
 
@@ -112,3 +109,21 @@ Integration test our REST API spec and also act as documentation of API requirem
 2.  Add to Cart the product with zero inventory.
     + `PATCH /user/cart`
     + Get back HttpStatus.BAD_REQUEST(400) since we cannot add out of stock items to cart.
+
+### changeBillingInfoTest()
+
+1. Patch user with new billing info
+    + `Patch /user`
+2. Get user from system and check all updated information matches
+
+### changeCredInfo()
+
+1. Patch user with new cred
+    + `Patch /auth`
+2. Get user from system and check that the updated information matches
+
+### changeCredInfoWrongPass()
+
+1. Patch user with new cred but have wrong auth password in field
+   + `Patch /auth`
+2. Get back HttpStatus.isUnauthorized() since the old password is wrong
