@@ -110,19 +110,19 @@ Integration test our REST API spec and also act as documentation of API requirem
     + `PATCH /user/cart`
     + Get back HttpStatus.BAD_REQUEST(400) since we cannot add out of stock items to cart.
 
-### changeBillingInfoTest()
+#### changeBillingInfoTest()
 
 1. Patch user with new billing info
     + `Patch /user`
 2. Get user from system and check all updated information matches
 
-### changeCredInfo()
+#### changeCredInfo()
 
 1. Patch user with new cred
     + `Patch /auth`
 2. Get user from system and check that the updated information matches
 
-### changeCredInfoWrongPass()
+#### changeCredInfoWrongPass()
 
 1. Patch user with new cred but have wrong auth password in field
    + `Patch /auth`
